@@ -23,7 +23,7 @@ const App = () => {
         setError(null);
         setLoading(false);
       },
-      (err) => {
+      () => {
         setError("Unable to retrieve your location.");
         setLoading(false);
       }
@@ -39,7 +39,7 @@ const App = () => {
           );
           const data = await response.json();
           setQiblaDirection(data.data.direction);
-        } catch (err) {
+        } catch {
           setError("Failed to fetch Qibla direction.");
         }
       };
@@ -49,7 +49,7 @@ const App = () => {
 
   useEffect(() => {
     const handleOrientation = (event) => {
-      setDeviceOrientation(event.alpha);
+      setDeviceOrientation(event.alpha || 0);
     };
 
     window.addEventListener("deviceorientation", handleOrientation);
@@ -61,13 +61,7 @@ const App = () => {
   useEffect(() => {
     if (qiblaDirection !== null && deviceOrientation !== null) {
       const rotationDifference = Math.abs(qiblaDirection - deviceOrientation);
-
-      // Consider aligned if the difference is within 5 degrees
-      if (rotationDifference <= 5 || rotationDifference >= 355) {
-        setIsQiblaAligned(true);
-      } else {
-        setIsQiblaAligned(false);
-      }
+      setIsQiblaAligned(rotationDifference <= 5 || rotationDifference >= 355);
     }
   }, [qiblaDirection, deviceOrientation]);
 
@@ -92,10 +86,10 @@ const App = () => {
 
       {qiblaDirection !== null && (
         <div className="flex flex-col items-center mt-6">
-          <div className="relative w-56 h-56 bg-white rounded-full flex items-center justify-center border-4 border-green-500 shadow-lg">
-            {/* Qibla Arrow */}
+          <div className="relative w-64 h-64 bg-white rounded-full flex items-center justify-center border-4 border-green-500 shadow-lg">
+            {/* Qibla Icon */}
             <div
-              className={`absolute flex items-center justify-center`}
+              className="absolute w-10 h-10 transform origin-center"
               style={{
                 transform: `rotate(${qiblaDirection - deviceOrientation}deg)`,
               }}
@@ -103,28 +97,26 @@ const App = () => {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
-                fill="none"
-                strokeWidth={2}
-                stroke="currentColor"
-                className={`w-10 h-10 ${
+                fill="currentColor"
+                className={`w-full h-full ${
                   isQiblaAligned ? "text-green-500" : "text-red-500"
                 }`}
               >
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  fillRule="evenodd"
                   d="M12 2l4 6h-3v7h-2V8H8l4-6z"
+                  clipRule="evenodd"
                 />
-                <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
 
-            {/* Center Indicator */}
+            {/* Center Point */}
             <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
           </div>
+
           <p className="mt-4 text-xl font-medium">
             {isQiblaAligned ? (
-              <span className="text-green-300 font-bold">This is Qibla!</span>
+              <span className="text-green-300 font-bold">Aligned with Qibla!</span>
             ) : (
               "Rotate your device to find the Qibla."
             )}
