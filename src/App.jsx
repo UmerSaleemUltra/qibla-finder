@@ -93,12 +93,33 @@ const App = () => {
       {qiblaDirection !== null && (
         <div className="flex flex-col items-center mt-6">
           <div className="relative w-56 h-56 bg-white rounded-full flex items-center justify-center border-4 border-green-500 shadow-lg">
+            {/* Qibla Arrow */}
             <div
-              className={`w-1/2 h-1 ${
-                isQiblaAligned ? "bg-green-500" : "bg-red-500"
-              } absolute origin-bottom transform rounded-md`}
-              style={{ rotate: `${qiblaDirection - deviceOrientation}deg` }}
-            ></div>
+              className={`absolute flex items-center justify-center`}
+              style={{
+                transform: `rotate(${qiblaDirection - deviceOrientation}deg)`,
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                strokeWidth={2}
+                stroke="currentColor"
+                className={`w-10 h-10 ${
+                  isQiblaAligned ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 2l4 6h-3v7h-2V8H8l4-6z"
+                />
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+            </div>
+
+            {/* Center Indicator */}
             <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
           </div>
           <p className="mt-4 text-xl font-medium">
