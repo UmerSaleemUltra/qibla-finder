@@ -4,10 +4,10 @@ const App = () => {
   const [location, setLocation] = useState({ latitude: null, longitude: null });
   const [qiblaDirection, setQiblaDirection] = useState(null);
   const [deviceOrientation, setDeviceOrientation] = useState(0);
+  const [isQiblaAligned, setIsQiblaAligned] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Handle geolocation
   const handleGeolocation = () => {
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser.");
@@ -30,7 +30,6 @@ const App = () => {
     );
   };
 
-  // Fetch Qibla direction
   useEffect(() => {
     if (location.latitude && location.longitude) {
       const fetchQiblaDirection = async () => {
@@ -48,10 +47,9 @@ const App = () => {
     }
   }, [location]);
 
-  // Handle device orientation
   useEffect(() => {
     const handleOrientation = (event) => {
-      setDeviceOrientation(event.alpha); // Alpha is the compass direction
+      setDeviceOrientation(event.alpha);
     };
 
     window.addEventListener("deviceorientation", handleOrientation);
@@ -60,49 +58,61 @@ const App = () => {
     };
   }, []);
 
-  // Calculate the arrow rotation
-  const calculateRotation = () => {
+  useEffect(() => {
     if (qiblaDirection !== null && deviceOrientation !== null) {
-      return qiblaDirection - deviceOrientation;
-    }
-    return 0;
-  };
+      const rotationDifference = Math.abs(qiblaDirection - deviceOrientation);
 
-  const arrowRotation = calculateRotation();
+      // Consider aligned if the difference is within 5 degrees
+      if (rotationDifference <= 5 || rotationDifference >= 355) {
+        setIsQiblaAligned(true);
+      } else {
+        setIsQiblaAligned(false);
+      }
+    }
+  }, [qiblaDirection, deviceOrientation]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold text-blue-600 mb-6">Qibla Finder</h1>
+    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600 flex flex-col items-center justify-center text-white px-4">
+      <h1 className="text-4xl font-extrabold mb-6 drop-shadow-md">
+        Qibla Finder
+      </h1>
 
-      {/* Button to get location */}
       <button
         onClick={handleGeolocation}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-4"
+        className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-300 mb-6 font-semibold"
       >
         {loading ? "Fetching Location..." : "Use Current Location"}
       </button>
 
-      {/* Error message */}
-      {error && <p className="text-red-500">{error}</p>}
+      {error && (
+        <p className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
+          {error}
+        </p>
+      )}
 
-      {/* Display Qibla Direction */}
       {qiblaDirection !== null && (
-        <div className="flex flex-col items-center">
-          <div className="relative w-48 h-48 bg-gray-200 rounded-full flex items-center justify-center border-4 border-blue-500">
-            {/* Arrow pointing to Qibla */}
+        <div className="flex flex-col items-center mt-6">
+          <div className="relative w-56 h-56 bg-white rounded-full flex items-center justify-center border-4 border-green-500 shadow-lg">
             <div
-              className="w-1/2 h-1 bg-red-500 absolute origin-bottom transform"
-              style={{ rotate: `${arrowRotation}deg` }}
+              className={`w-1/2 h-1 ${
+                isQiblaAligned ? "bg-green-500" : "bg-red-500"
+              } absolute origin-bottom transform rounded-md`}
+              style={{ rotate: `${qiblaDirection - deviceOrientation}deg` }}
             ></div>
-            {/* Center Point */}
-            <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+            <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
           </div>
-          <p className="mt-4 text-lg text-gray-700">
-            The Qibla direction is{" "}
-            <span className="font-bold">{qiblaDirection.toFixed(2)}°</span>.
+          <p className="mt-4 text-xl font-medium">
+            {isQiblaAligned ? (
+              <span className="text-green-300 font-bold">This is Qibla!</span>
+            ) : (
+              "Rotate your device to find the Qibla."
+            )}
           </p>
-          <p className="mt-2 text-green-600 font-semibold">
-            Move your device to align the arrow with the Qibla!
+          <p className="mt-2 text-lg">
+            Qibla direction is{" "}
+            <span className="font-bold text-yellow-300">
+              {qiblaDirection.toFixed(2)}°
+            </span>.
           </p>
         </div>
       )}
