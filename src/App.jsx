@@ -87,7 +87,23 @@ const App = () => {
       {qiblaDirection !== null && (
         <div className="flex flex-col items-center mt-6">
           <div className="relative w-64 h-64 bg-white rounded-full flex items-center justify-center border-4 border-green-500 shadow-lg">
-            {/* Qibla Icon */}
+            {/* Kaaba Icon */}
+            <div className="absolute w-10 h-10 bg-black rounded-full flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="white"
+                className="w-6 h-6"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M12 2l4 6h-3v7h-2V8H8l4-6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+
+            {/* Qibla Direction Arrow */}
             <div
               className="absolute w-10 h-10 transform origin-center"
               style={{
@@ -124,8 +140,8 @@ const App = () => {
           <p className="mt-2 text-lg">
             Qibla direction is{" "}
             <span className="font-bold text-yellow-300">
-              {qiblaDirection.toFixed(2)}°
-            </span>.
+              {qiblaDirection.toFixed(2)}°.
+            </span>
           </p>
         </div>
       )}
